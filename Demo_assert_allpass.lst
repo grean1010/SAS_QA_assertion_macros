@@ -1,0 +1,129 @@
+                                          The SAS System         07:28 Wednesday, May 23, 2018   1
+*********************************************************************************************
+***                      Results of Dataset Contents Checks Performed                     ***
+***                        There were 7 such checks performed                             ***
+*********************************************************************************************
+
+Check   Dataset                               Assertion Check
+Number   Name                                 Results (if any)
+------  -------                               ----------------
+1       states
+PASSED-- Dataset states Has Observations, as expected
+
+    Additional Dataset Information:
+    # Obs:                                    46
+    # Vars:                                   2
+    Creation Date/Times:                      23MAY18:07:28:07
+    Dataset Notes: States data without total
+
+
+2       us                                    PASSED-- Dataset us Has Observations, as expected
+
+    Additional Dataset Information:
+    # Obs:                                    1
+    # Vars:                                   2
+    Creation Date/Times:                      23MAY18:07:28:07
+    Elapsed time since last dataset check:    -0.008       minutes
+                                              0            hours
+    Dataset Notes: Total Only
+
+
+3       probs                                 PASSED-- probs Has No Observations, as expected
+
+    Additional Dataset Information:
+    # Obs:                                    0
+    # Vars:                                   2
+    Creation Date/Times:                      23MAY18:07:28:07
+    Elapsed time since last dataset check:    -0.008       minutes
+                                              0            hours
+    Dataset Notes: Total Only
+
+
+4       states
+PASSED-- Dataset states Has Observations, as expected
+
+    Additional Dataset Information:
+    # Obs:                                    46
+    # Vars:                                   2
+    Creation Date/Times:                      23MAY18:07:28:07
+    Elapsed time since last dataset check:    -0.002       minutes
+                                              0            hours
+    Dataset Notes: States data de-duplicated
+
+
+5       states
+N/A-- No Contents Assertion Performed for Dataset states
+                                          The SAS System         07:28 Wednesday, May 23, 2018   2
+
+    Additional Dataset Information:
+    # Obs:                                    46
+    # Vars:                                   2
+    Creation Date/Times:                      23MAY18:07:28:07
+    Elapsed time since last dataset check:    -0.002       minutes
+                                              0            hours
+    Dataset Notes: States data de-duplicated
+
+
+6       total_comp
+PASSED-- Dataset total_comp Has Observations, as expected
+
+    Additional Dataset Information:
+    # Obs:                                    1
+    # Vars:                                   2
+    Creation Date/Times:                      23MAY18:07:28:07
+    Elapsed time since last dataset check:    0.002        minutes
+                                              0            hours
+    Dataset Notes: States collapsed to total only
+
+
+7       compare_them
+PASSED-- Dataset compare_them Has Observations, as expected
+
+    Additional Dataset Information:
+    # Obs:                                    1
+    # Vars:                                   3
+    Creation Date/Times:                      23MAY18:07:28:07
+    Elapsed time since last dataset check:    0.004        minutes
+                                              0            hours
+    Dataset Notes: Comparison dataset
+
+
+
+*********************************************************************************************
+
+*********************************************************************************************
+***                    Results of Stand-alone Assertion Checks Performed                  ***
+***                        There were 1 such checks performed                             ***
+*********************************************************************************************
+
+Check Number       Check Performed and Result
+------------       --------------------------
+1                  PASSED-- No US Total included in states dataset -- TRUE
+
+*********************************************************************************************
+
+*********************************************************************************************
+***                Results of Within-Data_Step Assertion Checks Performed                 ***
+***                        There were 3 such checks performed                             ***
+***  Check below this print to make sure there are no failures masked by the fact that a  ***
+***  data step did not complete due to the assertion failure.  The fail message will be   ***
+***  printed both above and below this section.                                           ***
+                                          The SAS System         07:28 Wednesday, May 23, 2018   3
+*********************************************************************************************
+
+Check Number       Check Performed                                        Result
+------------       ---------------                                        ------
+1                  1                                                      PASSED
+2                  (1=1)                                                  PASSED
+3                  (round(total,.01) = round(state_total_obs,.01))        PASSED
+
+*********************************************************************************************
+
+*********************************************************************************************
+
+
+
+
+
+
+*********************************************************************************************

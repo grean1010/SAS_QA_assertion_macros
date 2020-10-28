@@ -1,0 +1,3311 @@
+1                                                          The SAS System                              07:28 Wednesday, May 23, 2018
+
+NOTE: Unable to open SASUSER.REGSTRY. WORK.REGSTRY will be opened instead.
+NOTE: All registry changes will be lost at the end of the session.
+
+WARNING: Unable to copy SASUSER registry to WORK registry. Because of this, you will not see registry customizations during this 
+         session.
+NOTE: Unable to open SASUSER.PROFILE. WORK.PROFILE will be opened instead.
+NOTE: All profile changes will be lost at the end of the session.
+NOTE: Copyright (c) 2002-2012 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.4 (TS1M0) 
+      Licensed to MATHEMATICA POLICY RESEARCH INC, Site 70083794.
+NOTE: This session is executing on the X64_7PRO  platform.
+
+
+
+NOTE: Updated analytical products:
+      
+      SAS/STAT 12.3 (maintenance)
+      SAS/ETS 12.3 (maintenance)
+      SAS/IML 12.3 (maintenance)
+
+NOTE: Additional host information:
+
+ X64_7PRO WIN 6.1.7601 Service Pack 1 Workstation
+
+NOTE: SAS initialization used:
+      real time           1.30 seconds
+      cpu time            0.23 seconds
+      
+1          /*********************************************************************/
+2          /* Program    :  Demo_Things.sas                                     */
+3          /* Description:  Demonstrate macros and tricks as outlined in the    */
+4          /*               Data Quality presentation given on xx/xx/2018       */
+5          /* Input      :  DQ macros, dummy data                               */
+6          /* Output     :  Lst file with helpful information                   */
+7          /* Note       :                                                      */
+8          /*                                                                   */
+9          /*********************************************************************/
+10         options mlogic mprint symbolgen;
+11         
+12         * Libnames for use in demo;
+13         libname testdata "\\mathematica.Net\NDrive\Transfer\MHudson\DQ";
+NOTE: Libref TESTDATA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: \\mathematica.Net\NDrive\Transfer\MHudson\DQ
+14         
+15         %include "\\mathematica.Net\NDrive\Transfer\MHudson\DQ\qa_assert_tracker.sas";
+390        
+391        %qa_setup;
+MLOGIC(QA_SETUP):  Beginning execution.
+MPRINT(QA_SETUP):   * Create global macro variables to be updated throughout the program.;
+MLOGIC(QA_SETUP):  %GLOBAL  CNUM CHECKNUM ANUM ANUM_PREVIOUS PREV_ASSERTION
+MPRINT(QA_SETUP):   * Intialize counter variables to zero. Set previous assertion to blank.;
+MLOGIC(QA_SETUP):  %LET (variable name is CNUM)
+2                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_SETUP):  %LET (variable name is CHECKNUM)
+MLOGIC(QA_SETUP):  %LET (variable name is ANUM)
+MLOGIC(QA_SETUP):  %LET (variable name is ANUM_PREVIOUS)
+MLOGIC(QA_SETUP):  %LET (variable name is PREV_ASSERTION)
+MLOGIC(QA_SETUP):  Ending execution.
+392        
+393        
+394        data states us (keep=state_code state_total_obs) probs;
+395          set testdata.states;
+396          if state_code = 'US' then output us;
+397          else if state_code = "XX" then output probs;
+398          else output states;
+399        run;
+
+NOTE: There were 47 observations read from the data set TESTDATA.STATES.
+NOTE: The data set WORK.STATES has 46 observations and 2 variables.
+NOTE: The data set WORK.US has 1 observations and 2 variables.
+NOTE: The data set WORK.PROBS has 0 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.42 seconds
+      cpu time            0.01 seconds
+      
+
+400        
+401        * Check the contents of these datasets;
+402        %qa_cont(dsname=states,obsyesnona=YES,note=States data without total);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value states
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value YES
+MLOGIC(QA_CONT):  Parameter NOTE has value States data without total
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 0
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME1)
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+3                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_CONT):  %LET (variable name is NOTE1)
+SYMBOLGEN:  Macro variable NOTE resolves to States data without total
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: The file WORK.CONTENTS_TEMP (memtype=DATA) was not found, but appears on a DELETE statement.
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   proc contents data=states noprint out=contents_temp (keep=nobs libname memname 
+varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+NOTE: There were 2 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+MPRINT(QA_CONT):   call symput("obscount1",left(trim(nobs)));
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+MPRINT(QA_CONT):   call symput("varcount1",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+MPRINT(QA_CONT):   call symput("dtime1",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   obsyesnona = "YES";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+4                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults1","PASSED-- Dataset states Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   else call symput("cresults1","FAILED-- states Has No Observation but should");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults1","PASSED-- states Has No Observations, 
+as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   else call symput("cresults1","FAILED-- Dataset states Has Observation but 
+should not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   call symput("cresults1","N/A-- No Contents Assertion Performed for Dataset 
+states");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is FALSE
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+      402:144   402:195   
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 6 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+SYMBOLGEN:  Macro variable CRESULTS1 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+403        %qa_cont(dsname=us,obsyesnona=YES,note=Total Only);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value us
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value YES
+MLOGIC(QA_CONT):  Parameter NOTE has value Total Only
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+5                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 1
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME2)
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MLOGIC(QA_CONT):  %LET (variable name is NOTE2)
+SYMBOLGEN:  Macro variable NOTE resolves to Total Only
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: Deleting WORK.CONTENTS_TEMP (memtype=DATA).
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+MPRINT(QA_CONT):   proc contents data=us noprint out=contents_temp (keep=nobs libname memname 
+varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+6                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+NOTE: There were 2 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   call symput("obscount2",left(trim(nobs)));
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   call symput("varcount2",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   call symput("dtime2",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   obsyesnona = "YES";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults2","PASSED-- Dataset us Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+MPRINT(QA_CONT):   else call symput("cresults2","FAILED-- us Has No Observation but should");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults2","PASSED-- us Has No Observations, as 
+expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+MPRINT(QA_CONT):   else call symput("cresults2","FAILED-- Dataset us Has Observation but should 
+not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable DSNAME resolves to us
+MPRINT(QA_CONT):   call symput("cresults2","N/A-- No Contents Assertion Performed for Dataset 
+us");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is TRUE
+MLOGIC(QA_CONT):  %LET (variable name is TEMPNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   format prevdate datetime16.;
+7                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable TEMPNUM resolves to 1
+SYMBOLGEN:  Macro variable DTIME1 resolves to 23MAY18:07:28:07
+MPRINT(QA_CONT):   prevdate = input("23MAY18:07:28:07",datetime16.);
+MPRINT(QA_CONT):   elapsed_time_minutes = (crdate - prevdate) / 60;
+MPRINT(QA_CONT):   elapsed_time_hours = elapsed_time_minutes / 60;
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   call symput("elapsed_min_2",left(trim(round(elapsed_time_minutes,.001))));
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   call symput("elapsed_hrs_2",left(trim(round(elapsed_time_hours,.001))));
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+      403:144   403:195   403:249   403:81    
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+SYMBOLGEN:  Macro variable CRESULTS2 resolves to PASSED-- Dataset us Has Observations, as expected
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+404        %qa_cont(dsname=probs,obsyesnona=NO,note=Total Only);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value probs
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value NO
+MLOGIC(QA_CONT):  Parameter NOTE has value Total Only
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 2
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to NO
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+8                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME3)
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MLOGIC(QA_CONT):  %LET (variable name is NOTE3)
+SYMBOLGEN:  Macro variable NOTE resolves to Total Only
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: Deleting WORK.CONTENTS_TEMP (memtype=DATA).
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+MPRINT(QA_CONT):   proc contents data=probs noprint out=contents_temp (keep=nobs libname memname 
+varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+NOTE: There were 2 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   call symput("obscount3",left(trim(nobs)));
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   call symput("varcount3",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   call symput("dtime3",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+9                                         The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to NO
+MPRINT(QA_CONT):   obsyesnona = "NO";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults3","PASSED-- Dataset probs Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+MPRINT(QA_CONT):   else call symput("cresults3","FAILED-- probs Has No Observation but should");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults3","PASSED-- probs Has No Observations, 
+as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+MPRINT(QA_CONT):   else call symput("cresults3","FAILED-- Dataset probs Has Observation but 
+should not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable DSNAME resolves to probs
+MPRINT(QA_CONT):   call symput("cresults3","N/A-- No Contents Assertion Performed for Dataset 
+probs");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is TRUE
+MLOGIC(QA_CONT):  %LET (variable name is TEMPNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   format prevdate datetime16.;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable TEMPNUM resolves to 2
+SYMBOLGEN:  Macro variable DTIME2 resolves to 23MAY18:07:28:07
+MPRINT(QA_CONT):   prevdate = input("23MAY18:07:28:07",datetime16.);
+MPRINT(QA_CONT):   elapsed_time_minutes = (crdate - prevdate) / 60;
+MPRINT(QA_CONT):   elapsed_time_hours = elapsed_time_minutes / 60;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   call symput("elapsed_min_3",left(trim(round(elapsed_time_minutes,.001))));
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   call symput("elapsed_hrs_3",left(trim(round(elapsed_time_hours,.001))));
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+      404:144   404:195   404:249   404:81    
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+10                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+SYMBOLGEN:  Macro variable CRESULTS3 resolves to PASSED-- probs Has No Observations, as expected
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+405        
+406        * This contents check is designed to fail. Comment in to demonstrate ;
+407        * a contents assertion failure.;
+408        *%qa_cont(dsname=us,obsyesnona=NO,note=Total Only);
+409        
+410        data check;
+411          set states;
+412          if state_code = "US" then result = 0;
+413          else result = 1;
+414        run;
+
+NOTE: There were 46 observations read from the data set WORK.STATES.
+NOTE: The data set WORK.CHECK has 46 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+415        
+416        %qa_check_results(No US Total included in states dataset);
+MLOGIC(QA_CHECK_RESULTS):  Beginning execution.
+MLOGIC(QA_CHECK_RESULTS):  Parameter CHECKDESC has value No US Total included in states dataset
+MPRINT(QA_CHECK_RESULTS):   * Increment the count of data checks that we have performed. ;
+MPRINT(QA_CHECK_RESULTS):   * This is used to keep checknum and to make the final printout 
+easier. ;
+MLOGIC(QA_CHECK_RESULTS):  %LET (variable name is CHECKNUM)
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 0
+MPRINT(QA_CHECK_RESULTS):   * Create a global macro variables to hold the check description and 
+result. ;
+MLOGIC(QA_CHECK_RESULTS):  %GLOBAL  CHECKRESULT&CHECKNUM
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MPRINT(QA_CHECK_RESULTS):   * Delete the temp dataset as a precaution ;
+MPRINT(QA_CHECK_RESULTS):   proc datasets lib=work nolist;
+MPRINT(QA_CHECK_RESULTS):   delete check_temp;
+MPRINT(QA_CHECK_RESULTS):   run;
+
+NOTE: The file WORK.CHECK_TEMP (memtype=DATA) was not found, but appears on a DELETE statement.
+MPRINT(QA_CHECK_RESULTS):   * Initialize the result to be passing. ;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_CHECK_RESULTS):  %LET (variable name is CHECKRESULT1)
+SYMBOLGEN:  Macro variable CHECKDESC resolves to No US Total included in states dataset
+MPRINT(QA_CHECK_RESULTS):   * Bring in one observation from the dataset where the result is 
+failing. ;
+
+11                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CHECK_RESULTS):   data _null_;
+MPRINT(QA_CHECK_RESULTS):   set check (where=(result=0) obs=1);
+MPRINT(QA_CHECK_RESULTS):   * If the check failed then dump all checks prior to this point into 
+the lst ;
+MPRINT(QA_CHECK_RESULTS):   * file and end SAS. ;
+MPRINT(QA_CHECK_RESULTS):   if result = 0 then do;
+MLOGIC(QA_FAILPRINT):  Beginning execution.
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+SYMBOLGEN:  Macro variable CHECKDESC resolves to No US Total included in states dataset
+MLOGIC(QA_FAILPRINT):  Parameter FAILMSG has value STAND-ALONE ASSERTION CHECK 1 FAILED-- No US 
+      Total included in states dataset -- NOT TRUE
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put "***    ASSERTION FAILURE!  ASSERTION FAILURE!  ASSERTION FAILURE!  
+ASSERTION FAILURE!     ***";
+MPRINT(QA_FAILPRINT):   put "*** Previously run successful checks (if any) will print below. Must 
+fix and rerun!" @91 "***";
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FAILPRINT):   put "STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in 
+states dataset -- NOT TRUE";
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FAILPRINT):   put "STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in 
+states dataset -- NOT TRUE";
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FAILPRINT):   put "STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in 
+states dataset -- NOT TRUE";
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FAILPRINT):   put "STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in 
+states dataset -- NOT TRUE";
+MPRINT(QA_FAILPRINT):   put ;
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MLOGIC(QA_FINISH):  Beginning execution.
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MLOGIC(QA_FINISH):  Parameter FAILMSG has value STAND-ALONE ASSERTION CHECK 1 FAILED-- No US 
+      Total included in states dataset -- NOT TRUE
+MLOGIC(QA_FINISH):  Parameter WITHINDS has value Y
+MPRINT(QA_FINISH):   * If this is not called within a data step, then start of a null data step ;
+MPRINT(QA_FINISH):   * that will print to the lst file. ;
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+12                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MPRINT(QA_FINISH):   * Output the contents results, if any.;
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&cnum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                      Results of Dataset Contents Checks Performed   
+                  ***";
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_FINISH):   put "***                        There were 3 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check " @9 "Dataset" @47 "Assertion Check ";
+MPRINT(QA_FINISH):   put @1 "Number" @9 " Name" @47 "Results (if any)";
+MPRINT(QA_FINISH):   put @1 "------" @9 "-------" @47 "----------------";
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 3; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DSNAME1 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CRESULTS1 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "1" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable OBSCOUNT1 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable VARCOUNT1 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DTIME1 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is FALSE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable NOTE1 resolves to States data without total
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data without total";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+13                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DSNAME2 resolves to us
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable CRESULTS2 resolves to PASSED-- Dataset us Has Observations, as expected
+MPRINT(QA_FINISH):   put @1 "2" @9 "us" @47 "PASSED-- Dataset us Has Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable OBSCOUNT2 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable VARCOUNT2 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DTIME2 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 2
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_MIN_2 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_HRS_2 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable NOTE2 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DSNAME3 resolves to probs
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable CRESULTS3 resolves to PASSED-- probs Has No Observations, as expected
+MPRINT(QA_FINISH):   put @1 "3" @9 "probs" @47 "PASSED-- probs Has No Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable OBSCOUNT3 resolves to 0           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "0           " ;
+14                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable VARCOUNT3 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DTIME3 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_MIN_3 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_HRS_3 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable NOTE3 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the stand-alone assertion check results, if any;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&checknum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                    Results of Stand-alone Assertion Checks 
+Performed                  ***";
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MPRINT(QA_FINISH):   put "***                        There were 1 such checks performed           
+   " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed and Result" ;
+MPRINT(QA_FINISH):   put @1 "------------" @20 "--------------------------" ;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 1; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CHECKRESULT1 resolves to PASSED-- No US Total included in states 
+            dataset -- TRUE
+MPRINT(QA_FINISH):   put @1 "1" @20 "PASSED-- No US Total included in states dataset -- TRUE";
+15                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the within-datastep assertion check results, if any;
+SYMBOLGEN:  Macro variable ANUM resolves to 0
+MLOGIC(QA_FINISH):  %IF condition %eval(&anum) > 0 is FALSE
+MPRINT(QA_FINISH):   * To be sure that we do no miss an assertion failure, print the fail 
+message, ;
+MPRINT(QA_FINISH):   * if any, four times below the list of sucessful tests. The within-datastep ;
+MPRINT(QA_FINISH):   * failures will not be updated from pass to fail due to to the abort cancel ;
+MPRINT(QA_FINISH):   * that runs directly after them. Data step changes only happen when the data 
+;
+MPRINT(QA_FINISH):   * step completes. Thus the need to make extra sure these failures are highly 
+;
+MPRINT(QA_FINISH):   * visible. ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FINISH):   put " STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in states 
+dataset -- NOT TRUE ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FINISH):   put " STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in states 
+dataset -- NOT TRUE ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FINISH):   put " STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in states 
+dataset -- NOT TRUE ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total 
+            included in states dataset -- NOT TRUE
+MPRINT(QA_FINISH):   put " STAND-ALONE ASSERTION CHECK 1 FAILED-- No US Total included in states 
+dataset -- NOT TRUE ";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MLOGIC(QA_FINISH):  Ending execution.
+MPRINT(QA_FAILPRINT):  ;
+MLOGIC(QA_FAILPRINT):  Ending execution.
+MPRINT(QA_CHECK_RESULTS):  ;
+MPRINT(QA_CHECK_RESULTS):   abort cancel;
+MPRINT(QA_CHECK_RESULTS):   end;
+MPRINT(QA_CHECK_RESULTS):   run;
+
+NOTE: There were 0 observations read from the data set WORK.CHECK.
+      WHERE result=0;
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+16                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+      cpu time            0.01 seconds
+      
+
+MLOGIC(QA_CHECK_RESULTS):  Ending execution.
+417        
+418        * This check is designed to fail;
+419        data check;
+420          set states;
+421          if state_code = "US" then result = 1;
+422          else result = 0;
+423        run;
+
+NOTE: There were 46 observations read from the data set WORK.STATES.
+NOTE: The data set WORK.CHECK has 46 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+424        *%qa_check_results(US Total included in states dataset);
+425        
+426        
+427        proc sort data=states nodupkey;  by state_code; run;
+
+NOTE: There were 46 observations read from the data set WORK.STATES.
+NOTE: 0 observations with duplicate key values were deleted.
+NOTE: The data set WORK.STATES has 46 observations and 2 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+428        
+429        %qa_cont(dsname=states,obsyesnona=YES,note=States data de-duplicated);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value states
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value YES
+MLOGIC(QA_CONT):  Parameter NOTE has value States data de-duplicated
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 3
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+17                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME4)
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MLOGIC(QA_CONT):  %LET (variable name is NOTE4)
+SYMBOLGEN:  Macro variable NOTE resolves to States data de-duplicated
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: Deleting WORK.CONTENTS_TEMP (memtype=DATA).
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   proc contents data=states noprint out=contents_temp (keep=nobs libname memname 
+varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+NOTE: There were 2 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   call symput("obscount4",left(trim(nobs)));
+18                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   call symput("varcount4",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   call symput("dtime4",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   obsyesnona = "YES";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults4","PASSED-- Dataset states Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   else call symput("cresults4","FAILED-- states Has No Observation but should");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults4","PASSED-- states Has No Observations, 
+as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   else call symput("cresults4","FAILED-- Dataset states Has Observation but 
+should not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   call symput("cresults4","N/A-- No Contents Assertion Performed for Dataset 
+states");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is TRUE
+MLOGIC(QA_CONT):  %LET (variable name is TEMPNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   format prevdate datetime16.;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable TEMPNUM resolves to 3
+SYMBOLGEN:  Macro variable DTIME3 resolves to 23MAY18:07:28:07
+MPRINT(QA_CONT):   prevdate = input("23MAY18:07:28:07",datetime16.);
+MPRINT(QA_CONT):   elapsed_time_minutes = (crdate - prevdate) / 60;
+MPRINT(QA_CONT):   elapsed_time_hours = elapsed_time_minutes / 60;
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   call symput("elapsed_min_4",left(trim(round(elapsed_time_minutes,.001))));
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   call symput("elapsed_hrs_4",left(trim(round(elapsed_time_hours,.001))));
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+19                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+      429:144   429:195   429:249   429:81    
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+SYMBOLGEN:  Macro variable CRESULTS4 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+430        %qa_cont(dsname=states,obsyesnona=NA,note=States data de-duplicated);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value states
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value NA
+MLOGIC(QA_CONT):  Parameter NOTE has value States data de-duplicated
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 4
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to NA
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME5)
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MLOGIC(QA_CONT):  %LET (variable name is NOTE5)
+SYMBOLGEN:  Macro variable NOTE resolves to States data de-duplicated
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: Deleting WORK.CONTENTS_TEMP (memtype=DATA).
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+20                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   proc contents data=states noprint out=contents_temp (keep=nobs libname memname 
+varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+NOTE: There were 2 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   call symput("obscount5",left(trim(nobs)));
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   call symput("varcount5",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   call symput("dtime5",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to NA
+MPRINT(QA_CONT):   obsyesnona = "NA";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults5","PASSED-- Dataset states Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   else call symput("cresults5","FAILED-- states Has No Observation but should");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+21                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults5","PASSED-- states Has No Observations, 
+as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   else call symput("cresults5","FAILED-- Dataset states Has Observation but 
+should not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable DSNAME resolves to states
+MPRINT(QA_CONT):   call symput("cresults5","N/A-- No Contents Assertion Performed for Dataset 
+states");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is TRUE
+MLOGIC(QA_CONT):  %LET (variable name is TEMPNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   format prevdate datetime16.;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable TEMPNUM resolves to 4
+SYMBOLGEN:  Macro variable DTIME4 resolves to 23MAY18:07:28:07
+MPRINT(QA_CONT):   prevdate = input("23MAY18:07:28:07",datetime16.);
+MPRINT(QA_CONT):   elapsed_time_minutes = (crdate - prevdate) / 60;
+MPRINT(QA_CONT):   elapsed_time_hours = elapsed_time_minutes / 60;
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   call symput("elapsed_min_5",left(trim(round(elapsed_time_minutes,.001))));
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   call symput("elapsed_hrs_5",left(trim(round(elapsed_time_hours,.001))));
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+      430:144   430:195   430:249   430:81    
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+SYMBOLGEN:  Macro variable CRESULTS5 resolves to N/A-- No Contents Assertion Performed for 
+            Dataset states
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+431        
+432        data total_comp (keep=state_code total);
+433          set states end=lastobs;
+22                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+434          if _n_ = 1 then total = 0;
+435          retain total;
+436          total = total + state_total_obs;
+437          if lastobs then do;
+438            state_code = "US";
+439            output;
+440          end;
+441        run;
+
+NOTE: There were 46 observations read from the data set WORK.STATES.
+NOTE: The data set WORK.TOTAL_COMP has 1 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+442        
+443        %qa_cont(dsname=total_comp,obsyesnona=YES,note=States collapsed to total only);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value total_comp
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value YES
+MLOGIC(QA_CONT):  Parameter NOTE has value States collapsed to total only
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 5
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME6)
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_CONT):  %LET (variable name is NOTE6)
+SYMBOLGEN:  Macro variable NOTE resolves to States collapsed to total only
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: Deleting WORK.CONTENTS_TEMP (memtype=DATA).
+23                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+MPRINT(QA_CONT):   proc contents data=total_comp noprint out=contents_temp (keep=nobs libname 
+memname varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+NOTE: There were 2 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 2 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   call symput("obscount6",left(trim(nobs)));
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   call symput("varcount6",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   call symput("dtime6",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   obsyesnona = "YES";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults6","PASSED-- Dataset total_comp Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+MPRINT(QA_CONT):   else call symput("cresults6","FAILED-- total_comp Has No Observation but 
+24                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+should");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults6","PASSED-- total_comp Has No 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+MPRINT(QA_CONT):   else call symput("cresults6","FAILED-- Dataset total_comp Has Observation but 
+should not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable DSNAME resolves to total_comp
+MPRINT(QA_CONT):   call symput("cresults6","N/A-- No Contents Assertion Performed for Dataset 
+total_comp");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is TRUE
+MLOGIC(QA_CONT):  %LET (variable name is TEMPNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   format prevdate datetime16.;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable TEMPNUM resolves to 5
+SYMBOLGEN:  Macro variable DTIME5 resolves to 23MAY18:07:28:07
+MPRINT(QA_CONT):   prevdate = input("23MAY18:07:28:07",datetime16.);
+MPRINT(QA_CONT):   elapsed_time_minutes = (crdate - prevdate) / 60;
+MPRINT(QA_CONT):   elapsed_time_hours = elapsed_time_minutes / 60;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   call symput("elapsed_min_6",left(trim(round(elapsed_time_minutes,.001))));
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   call symput("elapsed_hrs_6",left(trim(round(elapsed_time_hours,.001))));
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+      443:144   443:195   443:249   443:81    
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+SYMBOLGEN:  Macro variable CRESULTS6 resolves to PASSED-- Dataset total_comp Has Observations, as 
+            expected
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+25                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+444        
+445        data compare_them;
+446          merge total_comp us;
+447          by state_code;
+448          %qa_assert(1);
+MLOGIC(QA_ASSERT):  Beginning execution.
+MLOGIC(QA_ASSERT):  Parameter ASSERTION has value 1
+MPRINT(QA_ASSERT):   * Check to see if this is a new assertion by comparing to the previous value;
+MPRINT(QA_ASSERT):   * of the macro variable prev_assertion (which is global). If they are ;
+MPRINT(QA_ASSERT):   * different then this is a new assertion. ;
+MPRINT(QA_ASSERT):   * This is important because otherwise each observation in a dataset will be ;
+MPRINT(QA_ASSERT):   * taken as a new assertion. ;
+SYMBOLGEN:  Macro variable ASSERTION resolves to 1
+SYMBOLGEN:  Macro variable PREV_ASSERTION resolves to 
+MLOGIC(QA_ASSERT):  %IF condition %upcase("&assertion.") ne %upcase("&prev_assertion.") is TRUE
+MPRINT(QA_ASSERT):   * Increment the assertion count number.;
+MLOGIC(QA_ASSERT):  %LET (variable name is ANUM)
+SYMBOLGEN:  Macro variable ANUM resolves to 0
+MPRINT(QA_ASSERT):   * Create a macro variable that contains the value of assertion associated ;
+MPRINT(QA_ASSERT):   * with this value of anum. We will use this to create the final list of ;
+MPRINT(QA_ASSERT):   * assertion checks. ;
+MLOGIC(QA_ASSERT):  %GLOBAL  ASSERTION&ANUM. ARESULT&ANUM
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+MLOGIC(QA_ASSERT):  %LET (variable name is ASSERTION1)
+SYMBOLGEN:  Macro variable ASSERTION resolves to 1
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+MLOGIC(QA_ASSERT):  %LET (variable name is ARESULT1)
+MPRINT(QA_ASSERT):   * Reset the value of prev_assertion so we can check against it the next ;
+MPRINT(QA_ASSERT):   * time the assertion macro runs. ;
+MLOGIC(QA_ASSERT):  %LET (variable name is PREV_ASSERTION)
+SYMBOLGEN:  Macro variable ASSERTION resolves to 1
+SYMBOLGEN:  Macro variable ASSERTION resolves to 1
+MPRINT(QA_ASSERT):   if 1 = 0 then do;
+MLOGIC(QA_FAILPRINT):  Beginning execution.
+SYMBOLGEN:  Macro variable ASSERTION resolves to 1
+MLOGIC(QA_FAILPRINT):  Parameter FAILMSG has value (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- 
+      NOT TRUE)
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put "***    ASSERTION FAILURE!  ASSERTION FAILURE!  ASSERTION FAILURE!  
+ASSERTION FAILURE!     ***";
+MPRINT(QA_FAILPRINT):   put "*** Previously run successful checks (if any) will print below. Must 
+fix and rerun!" @91 "***";
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+26                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE)";
+MPRINT(QA_FAILPRINT):   put ;
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MLOGIC(QA_FINISH):  Beginning execution.
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MLOGIC(QA_FINISH):  Parameter FAILMSG has value (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+      TRUE)
+MLOGIC(QA_FINISH):  Parameter WITHINDS has value Y
+MPRINT(QA_FINISH):   * If this is not called within a data step, then start of a null data step ;
+MPRINT(QA_FINISH):   * that will print to the lst file. ;
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MPRINT(QA_FINISH):   * Output the contents results, if any.;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&cnum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                      Results of Dataset Contents Checks Performed   
+                  ***";
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_FINISH):   put "***                        There were 6 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check " @9 "Dataset" @47 "Assertion Check ";
+MPRINT(QA_FINISH):   put @1 "Number" @9 " Name" @47 "Results (if any)";
+MPRINT(QA_FINISH):   put @1 "------" @9 "-------" @47 "----------------";
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 6; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DSNAME1 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CRESULTS1 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "1" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+27                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable OBSCOUNT1 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable VARCOUNT1 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DTIME1 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is FALSE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable NOTE1 resolves to States data without total
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data without total";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DSNAME2 resolves to us
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable CRESULTS2 resolves to PASSED-- Dataset us Has Observations, as expected
+MPRINT(QA_FINISH):   put @1 "2" @9 "us" @47 "PASSED-- Dataset us Has Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable OBSCOUNT2 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable VARCOUNT2 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DTIME2 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 2
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_MIN_2 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_HRS_2 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+28                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable NOTE2 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DSNAME3 resolves to probs
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable CRESULTS3 resolves to PASSED-- probs Has No Observations, as expected
+MPRINT(QA_FINISH):   put @1 "3" @9 "probs" @47 "PASSED-- probs Has No Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable OBSCOUNT3 resolves to 0           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "0           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable VARCOUNT3 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DTIME3 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_MIN_3 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_HRS_3 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable NOTE3 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DSNAME4 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable CRESULTS4 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "4" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+29                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable OBSCOUNT4 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable VARCOUNT4 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DTIME4 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 4
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_MIN_4 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_HRS_4 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable NOTE4 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 5; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DSNAME5 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable CRESULTS5 resolves to N/A-- No Contents Assertion Performed for 
+            Dataset states
+MPRINT(QA_FINISH):   put @1 "5" @9 "states" @47 "N/A-- No Contents Assertion Performed for 
+Dataset states";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable OBSCOUNT5 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable VARCOUNT5 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+30                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DTIME5 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 5
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_MIN_5 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_HRS_5 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable NOTE5 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 6; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DSNAME6 resolves to total_comp
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable CRESULTS6 resolves to PASSED-- Dataset total_comp Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "6" @9 "total_comp" @47 "PASSED-- Dataset total_comp Has 
+Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable OBSCOUNT6 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable VARCOUNT6 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DTIME6 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable ELAPSED_MIN_6 resolves to 0.002       
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "0.002        minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+31                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable ELAPSED_HRS_6 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable NOTE6 resolves to States collapsed to total only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States collapsed to total only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 7; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the stand-alone assertion check results, if any;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&checknum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                    Results of Stand-alone Assertion Checks 
+Performed                  ***";
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MPRINT(QA_FINISH):   put "***                        There were 1 such checks performed           
+   " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed and Result" ;
+MPRINT(QA_FINISH):   put @1 "------------" @20 "--------------------------" ;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 1; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CHECKRESULT1 resolves to PASSED-- No US Total included in states 
+            dataset -- TRUE
+MPRINT(QA_FINISH):   put @1 "1" @20 "PASSED-- No US Total included in states dataset -- TRUE";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the within-datastep assertion check results, if any;
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&anum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                Results of Within-Data_Step Assertion Checks 
+Performed                 ***";
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+MPRINT(QA_FINISH):   put "***                        There were 1 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put "***  Check below this print to make sure there are no failures masked 
+by the fact that a  ***";
+32                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):   put "***  data step did not complete due to the assertion failure.  The fail 
+message will be   ***";
+MPRINT(QA_FINISH):   put "***  printed both above and below this section.                         
+                  ***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed" @75 "Result";
+MPRINT(QA_FINISH):   put @1 "------------" @20 "---------------" @75 "------";
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 1; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ASSERTION1 resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ARESULT1 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "1" @20 "1" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * To be sure that we do no miss an assertion failure, print the fail 
+message, ;
+MPRINT(QA_FINISH):   * if any, four times below the list of sucessful tests. The within-datastep ;
+MPRINT(QA_FINISH):   * failures will not be updated from pass to fail due to to the abort cancel ;
+MPRINT(QA_FINISH):   * that runs directly after them. Data step changes only happen when the data 
+;
+MPRINT(QA_FINISH):   * step completes. Thus the need to make extra sure these failures are highly 
+;
+MPRINT(QA_FINISH):   * visible. ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT 
+            TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- 1 -- NOT TRUE) ";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+33                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MLOGIC(QA_FINISH):  Ending execution.
+MPRINT(QA_FAILPRINT):  ;
+MLOGIC(QA_FAILPRINT):  Ending execution.
+MPRINT(QA_ASSERT):  ;
+MPRINT(QA_ASSERT):   abort cancel;
+MPRINT(QA_ASSERT):   end;
+MLOGIC(QA_ASSERT):  Ending execution.
+449          %qa_assert((1=1));
+MLOGIC(QA_ASSERT):  Beginning execution.
+MLOGIC(QA_ASSERT):  Parameter ASSERTION has value (1=1)
+MPRINT(QA_ASSERT):   * Check to see if this is a new assertion by comparing to the previous value;
+MPRINT(QA_ASSERT):   * of the macro variable prev_assertion (which is global). If they are ;
+MPRINT(QA_ASSERT):   * different then this is a new assertion. ;
+MPRINT(QA_ASSERT):   * This is important because otherwise each observation in a dataset will be ;
+MPRINT(QA_ASSERT):   * taken as a new assertion. ;
+SYMBOLGEN:  Macro variable ASSERTION resolves to (1=1)
+SYMBOLGEN:  Macro variable PREV_ASSERTION resolves to 1
+MLOGIC(QA_ASSERT):  %IF condition %upcase("&assertion.") ne %upcase("&prev_assertion.") is TRUE
+MPRINT(QA_ASSERT):   * Increment the assertion count number.;
+MLOGIC(QA_ASSERT):  %LET (variable name is ANUM)
+SYMBOLGEN:  Macro variable ANUM resolves to 1
+MPRINT(QA_ASSERT):   * Create a macro variable that contains the value of assertion associated ;
+MPRINT(QA_ASSERT):   * with this value of anum. We will use this to create the final list of ;
+MPRINT(QA_ASSERT):   * assertion checks. ;
+MLOGIC(QA_ASSERT):  %GLOBAL  ASSERTION&ANUM. ARESULT&ANUM
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+MLOGIC(QA_ASSERT):  %LET (variable name is ASSERTION2)
+SYMBOLGEN:  Macro variable ASSERTION resolves to (1=1)
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+MLOGIC(QA_ASSERT):  %LET (variable name is ARESULT2)
+MPRINT(QA_ASSERT):   * Reset the value of prev_assertion so we can check against it the next ;
+MPRINT(QA_ASSERT):   * time the assertion macro runs. ;
+MLOGIC(QA_ASSERT):  %LET (variable name is PREV_ASSERTION)
+SYMBOLGEN:  Macro variable ASSERTION resolves to (1=1)
+SYMBOLGEN:  Macro variable ASSERTION resolves to (1=1)
+MPRINT(QA_ASSERT):   if (1=1) = 0 then do;
+MLOGIC(QA_FAILPRINT):  Beginning execution.
+SYMBOLGEN:  Macro variable ASSERTION resolves to (1=1)
+MLOGIC(QA_FAILPRINT):  Parameter FAILMSG has value (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) 
+      -- NOT TRUE)
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put "***    ASSERTION FAILURE!  ASSERTION FAILURE!  ASSERTION FAILURE!  
+ASSERTION FAILURE!     ***";
+MPRINT(QA_FAILPRINT):   put "*** Previously run successful checks (if any) will print below. Must 
+fix and rerun!" @91 "***";
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+34                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+            NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE)";
+MPRINT(QA_FAILPRINT):   put ;
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MLOGIC(QA_FINISH):  Beginning execution.
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MLOGIC(QA_FINISH):  Parameter FAILMSG has value (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+      NOT TRUE)
+MLOGIC(QA_FINISH):  Parameter WITHINDS has value Y
+MPRINT(QA_FINISH):   * If this is not called within a data step, then start of a null data step ;
+MPRINT(QA_FINISH):   * that will print to the lst file. ;
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MPRINT(QA_FINISH):   * Output the contents results, if any.;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&cnum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                      Results of Dataset Contents Checks Performed   
+                  ***";
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_FINISH):   put "***                        There were 6 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check " @9 "Dataset" @47 "Assertion Check ";
+MPRINT(QA_FINISH):   put @1 "Number" @9 " Name" @47 "Results (if any)";
+MPRINT(QA_FINISH):   put @1 "------" @9 "-------" @47 "----------------";
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 6; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DSNAME1 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CRESULTS1 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "1" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+35                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable OBSCOUNT1 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable VARCOUNT1 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DTIME1 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is FALSE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable NOTE1 resolves to States data without total
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data without total";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DSNAME2 resolves to us
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable CRESULTS2 resolves to PASSED-- Dataset us Has Observations, as expected
+MPRINT(QA_FINISH):   put @1 "2" @9 "us" @47 "PASSED-- Dataset us Has Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable OBSCOUNT2 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable VARCOUNT2 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DTIME2 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 2
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_MIN_2 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+36                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_HRS_2 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable NOTE2 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DSNAME3 resolves to probs
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable CRESULTS3 resolves to PASSED-- probs Has No Observations, as expected
+MPRINT(QA_FINISH):   put @1 "3" @9 "probs" @47 "PASSED-- probs Has No Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable OBSCOUNT3 resolves to 0           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "0           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable VARCOUNT3 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DTIME3 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_MIN_3 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_HRS_3 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable NOTE3 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DSNAME4 resolves to states
+SYMBOLGEN:  && resolves to &.
+37                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable CRESULTS4 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "4" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable OBSCOUNT4 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable VARCOUNT4 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DTIME4 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 4
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_MIN_4 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_HRS_4 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable NOTE4 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 5; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DSNAME5 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable CRESULTS5 resolves to N/A-- No Contents Assertion Performed for 
+            Dataset states
+MPRINT(QA_FINISH):   put @1 "5" @9 "states" @47 "N/A-- No Contents Assertion Performed for 
+Dataset states";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable OBSCOUNT5 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+38                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable VARCOUNT5 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DTIME5 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 5
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_MIN_5 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_HRS_5 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable NOTE5 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 6; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DSNAME6 resolves to total_comp
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable CRESULTS6 resolves to PASSED-- Dataset total_comp Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "6" @9 "total_comp" @47 "PASSED-- Dataset total_comp Has 
+Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable OBSCOUNT6 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable VARCOUNT6 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DTIME6 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+39                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable ELAPSED_MIN_6 resolves to 0.002       
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "0.002        minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable ELAPSED_HRS_6 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable NOTE6 resolves to States collapsed to total only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States collapsed to total only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 7; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the stand-alone assertion check results, if any;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&checknum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                    Results of Stand-alone Assertion Checks 
+Performed                  ***";
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MPRINT(QA_FINISH):   put "***                        There were 1 such checks performed           
+   " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed and Result" ;
+MPRINT(QA_FINISH):   put @1 "------------" @20 "--------------------------" ;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 1; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CHECKRESULT1 resolves to PASSED-- No US Total included in states 
+            dataset -- TRUE
+MPRINT(QA_FINISH):   put @1 "1" @20 "PASSED-- No US Total included in states dataset -- TRUE";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the within-datastep assertion check results, if any;
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+MLOGIC(QA_FINISH):  %IF condition %eval(&anum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                Results of Within-Data_Step Assertion Checks 
+Performed                 ***";
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+40                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):   put "***                        There were 2 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put "***  Check below this print to make sure there are no failures masked 
+by the fact that a  ***";
+MPRINT(QA_FINISH):   put "***  data step did not complete due to the assertion failure.  The fail 
+message will be   ***";
+MPRINT(QA_FINISH):   put "***  printed both above and below this section.                         
+                  ***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed" @75 "Result";
+MPRINT(QA_FINISH):   put @1 "------------" @20 "---------------" @75 "------";
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 2; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ASSERTION1 resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ARESULT1 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "1" @20 "1" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ASSERTION2 resolves to (1=1)
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ARESULT2 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "2" @20 "(1=1)" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * To be sure that we do no miss an assertion failure, print the fail 
+message, ;
+MPRINT(QA_FINISH):   * if any, four times below the list of sucessful tests. The within-datastep ;
+MPRINT(QA_FINISH):   * failures will not be updated from pass to fail due to to the abort cancel ;
+MPRINT(QA_FINISH):   * that runs directly after them. Data step changes only happen when the data 
+;
+MPRINT(QA_FINISH):   * step completes. Thus the need to make extra sure these failures are highly 
+;
+MPRINT(QA_FINISH):   * visible. ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE) ";
+41                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- 
+            NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (1=1) -- NOT TRUE) ";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MLOGIC(QA_FINISH):  Ending execution.
+MPRINT(QA_FAILPRINT):  ;
+MLOGIC(QA_FAILPRINT):  Ending execution.
+MPRINT(QA_ASSERT):  ;
+MPRINT(QA_ASSERT):   abort cancel;
+MPRINT(QA_ASSERT):   end;
+MLOGIC(QA_ASSERT):  Ending execution.
+450          %qa_assert((round(total,.01) = round(state_total_obs,.01)));
+MLOGIC(QA_ASSERT):  Beginning execution.
+MLOGIC(QA_ASSERT):  Parameter ASSERTION has value (round(total,.01) = round(state_total_obs,.01))
+MPRINT(QA_ASSERT):   * Check to see if this is a new assertion by comparing to the previous value;
+MPRINT(QA_ASSERT):   * of the macro variable prev_assertion (which is global). If they are ;
+MPRINT(QA_ASSERT):   * different then this is a new assertion. ;
+MPRINT(QA_ASSERT):   * This is important because otherwise each observation in a dataset will be ;
+MPRINT(QA_ASSERT):   * taken as a new assertion. ;
+SYMBOLGEN:  Macro variable ASSERTION resolves to (round(total,.01) = round(state_total_obs,.01))
+SYMBOLGEN:  Macro variable PREV_ASSERTION resolves to (1=1)
+MLOGIC(QA_ASSERT):  %IF condition %upcase("&assertion.") ne %upcase("&prev_assertion.") is TRUE
+MPRINT(QA_ASSERT):   * Increment the assertion count number.;
+MLOGIC(QA_ASSERT):  %LET (variable name is ANUM)
+SYMBOLGEN:  Macro variable ANUM resolves to 2
+MPRINT(QA_ASSERT):   * Create a macro variable that contains the value of assertion associated ;
+MPRINT(QA_ASSERT):   * with this value of anum. We will use this to create the final list of ;
+MPRINT(QA_ASSERT):   * assertion checks. ;
+MLOGIC(QA_ASSERT):  %GLOBAL  ASSERTION&ANUM. ARESULT&ANUM
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MLOGIC(QA_ASSERT):  %LET (variable name is ASSERTION3)
+SYMBOLGEN:  Macro variable ASSERTION resolves to (round(total,.01) = round(state_total_obs,.01))
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MLOGIC(QA_ASSERT):  %LET (variable name is ARESULT3)
+MPRINT(QA_ASSERT):   * Reset the value of prev_assertion so we can check against it the next ;
+MPRINT(QA_ASSERT):   * time the assertion macro runs. ;
+MLOGIC(QA_ASSERT):  %LET (variable name is PREV_ASSERTION)
+SYMBOLGEN:  Macro variable ASSERTION resolves to (round(total,.01) = round(state_total_obs,.01))
+SYMBOLGEN:  Macro variable ASSERTION resolves to (round(total,.01) = round(state_total_obs,.01))
+MPRINT(QA_ASSERT):   if (round(total,.01) = round(state_total_obs,.01)) = 0 then do;
+MLOGIC(QA_FAILPRINT):  Beginning execution.
+42                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable ASSERTION resolves to (round(total,.01) = round(state_total_obs,.01))
+MLOGIC(QA_FAILPRINT):  Parameter FAILMSG has value (WITHIN DATASET ASSERTION CHECK FAILED-- 
+      (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put "***    ASSERTION FAILURE!  ASSERTION FAILURE!  ASSERTION FAILURE!  
+ASSERTION FAILURE!     ***";
+MPRINT(QA_FAILPRINT):   put "*** Previously run successful checks (if any) will print below. Must 
+fix and rerun!" @91 "***";
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MPRINT(QA_FAILPRINT):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE)";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FAILPRINT):   put "(WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE)";
+MPRINT(QA_FAILPRINT):   put ;
+MPRINT(QA_FAILPRINT):   put 
+"*********************************************************************************************";
+MLOGIC(QA_FINISH):  Beginning execution.
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MLOGIC(QA_FINISH):  Parameter FAILMSG has value (WITHIN DATASET ASSERTION CHECK FAILED-- 
+      (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MLOGIC(QA_FINISH):  Parameter WITHINDS has value Y
+MPRINT(QA_FINISH):   * If this is not called within a data step, then start of a null data step ;
+MPRINT(QA_FINISH):   * that will print to the lst file. ;
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MPRINT(QA_FINISH):   * Output the contents results, if any.;
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&cnum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                      Results of Dataset Contents Checks Performed   
+                  ***";
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_FINISH):   put "***                        There were 6 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+43                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check " @9 "Dataset" @47 "Assertion Check ";
+MPRINT(QA_FINISH):   put @1 "Number" @9 " Name" @47 "Results (if any)";
+MPRINT(QA_FINISH):   put @1 "------" @9 "-------" @47 "----------------";
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 6; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DSNAME1 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CRESULTS1 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "1" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable OBSCOUNT1 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable VARCOUNT1 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DTIME1 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is FALSE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable NOTE1 resolves to States data without total
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data without total";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DSNAME2 resolves to us
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable CRESULTS2 resolves to PASSED-- Dataset us Has Observations, as expected
+MPRINT(QA_FINISH):   put @1 "2" @9 "us" @47 "PASSED-- Dataset us Has Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable OBSCOUNT2 resolves to 1           
+44                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable VARCOUNT2 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DTIME2 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 2
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_MIN_2 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_HRS_2 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable NOTE2 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DSNAME3 resolves to probs
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable CRESULTS3 resolves to PASSED-- probs Has No Observations, as expected
+MPRINT(QA_FINISH):   put @1 "3" @9 "probs" @47 "PASSED-- probs Has No Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable OBSCOUNT3 resolves to 0           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "0           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable VARCOUNT3 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DTIME3 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+45                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable ELAPSED_MIN_3 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_HRS_3 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable NOTE3 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DSNAME4 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable CRESULTS4 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "4" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable OBSCOUNT4 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable VARCOUNT4 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DTIME4 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 4
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_MIN_4 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_HRS_4 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable NOTE4 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 5; loop will iterate again.
+46                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DSNAME5 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable CRESULTS5 resolves to N/A-- No Contents Assertion Performed for 
+            Dataset states
+MPRINT(QA_FINISH):   put @1 "5" @9 "states" @47 "N/A-- No Contents Assertion Performed for 
+Dataset states";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable OBSCOUNT5 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable VARCOUNT5 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DTIME5 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 5
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_MIN_5 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_HRS_5 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable NOTE5 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 6; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DSNAME6 resolves to total_comp
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable CRESULTS6 resolves to PASSED-- Dataset total_comp Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "6" @9 "total_comp" @47 "PASSED-- Dataset total_comp Has 
+Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+47                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable OBSCOUNT6 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable VARCOUNT6 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DTIME6 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable ELAPSED_MIN_6 resolves to 0.002       
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "0.002        minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable ELAPSED_HRS_6 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable NOTE6 resolves to States collapsed to total only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States collapsed to total only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 7; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the stand-alone assertion check results, if any;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&checknum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                    Results of Stand-alone Assertion Checks 
+Performed                  ***";
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MPRINT(QA_FINISH):   put "***                        There were 1 such checks performed           
+   " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed and Result" ;
+MPRINT(QA_FINISH):   put @1 "------------" @20 "--------------------------" ;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 1; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+48                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CHECKRESULT1 resolves to PASSED-- No US Total included in states 
+            dataset -- TRUE
+MPRINT(QA_FINISH):   put @1 "1" @20 "PASSED-- No US Total included in states dataset -- TRUE";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the within-datastep assertion check results, if any;
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&anum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                Results of Within-Data_Step Assertion Checks 
+Performed                 ***";
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MPRINT(QA_FINISH):   put "***                        There were 3 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put "***  Check below this print to make sure there are no failures masked 
+by the fact that a  ***";
+MPRINT(QA_FINISH):   put "***  data step did not complete due to the assertion failure.  The fail 
+message will be   ***";
+MPRINT(QA_FINISH):   put "***  printed both above and below this section.                         
+                  ***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed" @75 "Result";
+MPRINT(QA_FINISH):   put @1 "------------" @20 "---------------" @75 "------";
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 3; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ASSERTION1 resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ARESULT1 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "1" @20 "1" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ASSERTION2 resolves to (1=1)
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ARESULT2 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "2" @20 "(1=1)" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+49                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ASSERTION3 resolves to (round(total,.01) = round(state_total_obs,.01))
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ARESULT3 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "3" @20 "(round(total,.01) = round(state_total_obs,.01))" @75 
+"PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * To be sure that we do no miss an assertion failure, print the fail 
+message, ;
+MPRINT(QA_FINISH):   * if any, four times below the list of sucessful tests. The within-datastep ;
+MPRINT(QA_FINISH):   * failures will not be updated from pass to fail due to to the abort cancel ;
+MPRINT(QA_FINISH):   * that runs directly after them. Data step changes only happen when the data 
+;
+MPRINT(QA_FINISH):   * step completes. Thus the need to make extra sure these failures are highly 
+;
+MPRINT(QA_FINISH):   * visible. ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE) ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to (WITHIN DATASET ASSERTION CHECK FAILED-- 
+            (round(total,.01) = round(state_total_obs,.01)) -- NOT TRUE)
+MPRINT(QA_FINISH):   put " (WITHIN DATASET ASSERTION CHECK FAILED-- (round(total,.01) = 
+round(state_total_obs,.01)) -- NOT TRUE) ";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+SYMBOLGEN:  Macro variable WITHINDS resolves to Y
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is FALSE
+MLOGIC(QA_FINISH):  Ending execution.
+MPRINT(QA_FAILPRINT):  ;
+MLOGIC(QA_FAILPRINT):  Ending execution.
+MPRINT(QA_ASSERT):  ;
+MPRINT(QA_ASSERT):   abort cancel;
+MPRINT(QA_ASSERT):   end;
+MLOGIC(QA_ASSERT):  Ending execution.
+451        
+50                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+452          * this one is designed to fail;
+453          *%qa_assert((1=0));
+454        
+455        
+456        run;
+
+NOTE: There were 1 observations read from the data set WORK.TOTAL_COMP.
+NOTE: There were 1 observations read from the data set WORK.US.
+NOTE: The data set WORK.COMPARE_THEM has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.06 seconds
+      cpu time            0.03 seconds
+      
+
+457        
+458        %qa_cont(dsname=compare_them,obsyesnona=YES,note=Comparison dataset);
+MLOGIC(QA_CONT):  Beginning execution.
+MLOGIC(QA_CONT):  Parameter DSNAME has value compare_them
+MLOGIC(QA_CONT):  Parameter OBSYESNONA has value YES
+MLOGIC(QA_CONT):  Parameter NOTE has value Comparison dataset
+MPRINT(QA_CONT):   * Increment the count of datasets that we have performed a contents check on. ;
+MPRINT(QA_CONT):   * This is used to keep track and to make the final printout easier. ;
+MLOGIC(QA_CONT):  %LET (variable name is CNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 6
+MPRINT(QA_CONT):   * Upcase the obs-check indicator for consistency. ;
+MLOGIC(QA_CONT):  %LET (variable name is OBSYESNONA)
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   * Create global macro variables that contain the information for this run of ;
+MPRINT(QA_CONT):   * the contents checker. We will use this if/when we run the qa_finish macro. ;
+MLOGIC(QA_CONT):  %GLOBAL  DSNAME&CNUM NOTE&CNUM OBSCOUNT&CNUM VARCOUNT&CNUM DTIME&CNUM           
+       CRESULTS&CNUM ELAPSED_MIN_&CNUM ELAPSED_HRS_&CNUM
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MLOGIC(QA_CONT):  %LET (variable name is DSNAME7)
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MLOGIC(QA_CONT):  %LET (variable name is NOTE7)
+SYMBOLGEN:  Macro variable NOTE resolves to Comparison dataset
+MPRINT(QA_CONT):   * Delete the temp dataset as a precaution. ;
+MPRINT(QA_CONT):   proc datasets lib=work nolist;
+MPRINT(QA_CONT):   delete contents_temp;
+MPRINT(QA_CONT):   run;
+
+NOTE: Deleting WORK.CONTENTS_TEMP (memtype=DATA).
+MPRINT(QA_CONT):   * Run contents procedure on the dataset, keeping only the information we need ;
+NOTE: PROCEDURE DATASETS used (Total process time):
+51                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+MPRINT(QA_CONT):   proc contents data=compare_them noprint out=contents_temp (keep=nobs libname 
+memname varnum crdate);
+MPRINT(QA_CONT):   run;
+
+NOTE: The data set WORK.CONTENTS_TEMP has 3 observations and 5 variables.
+NOTE: PROCEDURE CONTENTS used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Sort by descending varnum so that the last variable in the dataset will be ;
+MPRINT(QA_CONT):   * displayed in the first observation, giving us the variable count. ;
+MPRINT(QA_CONT):   proc sort data=contents_temp;
+MPRINT(QA_CONT):   by descending varnum;
+MPRINT(QA_CONT):   run;
+
+NOTE: There were 3 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.CONTENTS_TEMP has 3 observations and 5 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the variable and observation count. Test assersions for the dataset.;
+MPRINT(QA_CONT):   * Create global observation and variable counts. ;
+MPRINT(QA_CONT):   data testcr;
+MPRINT(QA_CONT):   set contents_temp(obs=1);
+MPRINT(QA_CONT):   * Output contents info to global macro variables;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_CONT):   call symput("obscount7",left(trim(nobs)));
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_CONT):   call symput("varcount7",left(trim(varnum)));
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_CONT):   call symput("dtime7",put(crdate,datetime16.));
+MPRINT(QA_CONT):   * Create flags for pass/fail on this test;
+SYMBOLGEN:  Macro variable OBSYESNONA resolves to YES
+MPRINT(QA_CONT):   obsyesnona = "YES";
+MPRINT(QA_CONT):   obsyesnona = upcase(compress(obsyesnona));
+MPRINT(QA_CONT):   if obsyesnona = "YES" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+MPRINT(QA_CONT):   if nobs > 0 then call symput("cresults7","PASSED-- Dataset compare_them Has 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+MPRINT(QA_CONT):   else call symput("cresults7","FAILED-- compare_them Has No Observation but 
+should");
+MPRINT(QA_CONT):   end;
+52                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_CONT):   else if obsyesnona = "NO" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+MPRINT(QA_CONT):   if nobs = 0 then call symput("cresults7","PASSED-- compare_them Has No 
+Observations, as expected");
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+MPRINT(QA_CONT):   else call symput("cresults7","FAILED-- Dataset compare_them Has Observation 
+but should not");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   else if obsyesnona = "NA" then do;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable DSNAME resolves to compare_them
+MPRINT(QA_CONT):   call symput("cresults7","N/A-- No Contents Assertion Performed for Dataset 
+compare_them");
+MPRINT(QA_CONT):   end;
+MPRINT(QA_CONT):   * If this is not the first contents check then calculate elapsed time. ;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MLOGIC(QA_CONT):  %IF condition %eval(&cnum) > 1 is TRUE
+MLOGIC(QA_CONT):  %LET (variable name is TEMPNUM)
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_CONT):   format prevdate datetime16.;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable TEMPNUM resolves to 6
+SYMBOLGEN:  Macro variable DTIME6 resolves to 23MAY18:07:28:07
+MPRINT(QA_CONT):   prevdate = input("23MAY18:07:28:07",datetime16.);
+MPRINT(QA_CONT):   elapsed_time_minutes = (crdate - prevdate) / 60;
+MPRINT(QA_CONT):   elapsed_time_hours = elapsed_time_minutes / 60;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_CONT):   call symput("elapsed_min_7",left(trim(round(elapsed_time_minutes,.001))));
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_CONT):   call symput("elapsed_hrs_7",left(trim(round(elapsed_time_hours,.001))));
+MPRINT(QA_CONT):   run;
+
+NOTE: Numeric values have been converted to character values at the places given by: 
+      (Line):(Column).
+      458:144   458:195   458:249   458:81    
+NOTE: There were 1 observations read from the data set WORK.CONTENTS_TEMP.
+NOTE: The data set WORK.TESTCR has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(QA_CONT):   * Look at the results generated and populate macro variables accordingly. ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+SYMBOLGEN:  Macro variable CRESULTS7 resolves to PASSED-- Dataset compare_them Has Observations, 
+            as expected
+MLOGIC(QA_CONT):  %IF condition %qsubstr(%nrbquote(&&cresults&cnum),1,4)=FAIL is FALSE
+MLOGIC(QA_CONT):  Ending execution.
+459        
+460        %qa_finish(withinds=N);
+53                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MLOGIC(QA_FINISH):  Beginning execution.
+MLOGIC(QA_FINISH):  Parameter WITHINDS has value N
+MLOGIC(QA_FINISH):  Parameter FAILMSG has value 
+MPRINT(QA_FINISH):   * If this is not called within a data step, then start of a null data step ;
+MPRINT(QA_FINISH):   * that will print to the lst file. ;
+SYMBOLGEN:  Macro variable WITHINDS resolves to N
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is TRUE
+MPRINT(QA_FINISH):   data _null_;
+MPRINT(QA_FINISH):   file print;
+MPRINT(QA_FINISH):   * Output the contents results, if any.;
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MLOGIC(QA_FINISH):  %IF condition %eval(&cnum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                      Results of Dataset Contents Checks Performed   
+                  ***";
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MPRINT(QA_FINISH):   put "***                        There were 7 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check " @9 "Dataset" @47 "Assertion Check ";
+MPRINT(QA_FINISH):   put @1 "Number" @9 " Name" @47 "Results (if any)";
+MPRINT(QA_FINISH):   put @1 "------" @9 "-------" @47 "----------------";
+SYMBOLGEN:  Macro variable CNUM resolves to 7
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 7; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DSNAME1 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CRESULTS1 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "1" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable OBSCOUNT1 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable VARCOUNT1 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable DTIME1 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+54                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is FALSE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable NOTE1 resolves to States data without total
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data without total";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DSNAME2 resolves to us
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable CRESULTS2 resolves to PASSED-- Dataset us Has Observations, as expected
+MPRINT(QA_FINISH):   put @1 "2" @9 "us" @47 "PASSED-- Dataset us Has Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable OBSCOUNT2 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable VARCOUNT2 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable DTIME2 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 2
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_MIN_2 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ELAPSED_HRS_2 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable NOTE2 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DSNAME3 resolves to probs
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+55                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable CRESULTS3 resolves to PASSED-- probs Has No Observations, as expected
+MPRINT(QA_FINISH):   put @1 "3" @9 "probs" @47 "PASSED-- probs Has No Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable OBSCOUNT3 resolves to 0           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "0           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable VARCOUNT3 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable DTIME3 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_MIN_3 resolves to -0.008      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.008       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ELAPSED_HRS_3 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable NOTE3 resolves to Total Only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Total Only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DSNAME4 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable CRESULTS4 resolves to PASSED-- Dataset states Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "4" @9 "states" @47 "PASSED-- Dataset states Has Observations, as 
+expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable OBSCOUNT4 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable VARCOUNT4 resolves to 2           
+56                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable DTIME4 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 4
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_MIN_4 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable ELAPSED_HRS_4 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 4
+SYMBOLGEN:  Macro variable NOTE4 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 5; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DSNAME5 resolves to states
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable CRESULTS5 resolves to N/A-- No Contents Assertion Performed for 
+            Dataset states
+MPRINT(QA_FINISH):   put @1 "5" @9 "states" @47 "N/A-- No Contents Assertion Performed for 
+Dataset states";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable OBSCOUNT5 resolves to 46          
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "46          " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable VARCOUNT5 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable DTIME5 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 5
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_MIN_5 resolves to -0.002      
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "-0.002       minutes" ;
+SYMBOLGEN:  && resolves to &.
+57                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable ELAPSED_HRS_5 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 5
+SYMBOLGEN:  Macro variable NOTE5 resolves to States data de-duplicated
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States data de-duplicated";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 6; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DSNAME6 resolves to total_comp
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable CRESULTS6 resolves to PASSED-- Dataset total_comp Has Observations, as 
+            expected
+MPRINT(QA_FINISH):   put @1 "6" @9 "total_comp" @47 "PASSED-- Dataset total_comp Has 
+Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable OBSCOUNT6 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable VARCOUNT6 resolves to 2           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "2           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable DTIME6 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 6
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable ELAPSED_MIN_6 resolves to 0.002       
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "0.002        minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable ELAPSED_HRS_6 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 6
+SYMBOLGEN:  Macro variable NOTE6 resolves to States collapsed to total only
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: States collapsed to total only";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 7; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+58                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable DSNAME7 resolves to compare_them
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable CRESULTS7 resolves to PASSED-- Dataset compare_them Has Observations, 
+            as expected
+MPRINT(QA_FINISH):   put @1 "7" @9 "compare_them" @47 "PASSED-- Dataset compare_them Has 
+Observations, as expected";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @5 "Additional Dataset Information:";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable OBSCOUNT7 resolves to 1           
+MPRINT(QA_FINISH):   put @5 "# Obs: " @47 "1           " ;
+MPRINT(QA_FINISH):  ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable VARCOUNT7 resolves to 3           
+MPRINT(QA_FINISH):   put @5 "# Vars: " @47 "3           ";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable DTIME7 resolves to 23MAY18:07:28:07
+MPRINT(QA_FINISH):   put @5 "Creation Date/Times:" @47 "23MAY18:07:28:07";
+SYMBOLGEN:  Macro variable I resolves to 7
+MLOGIC(QA_FINISH):  %IF condition %eval(&i)>1 is TRUE
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable ELAPSED_MIN_7 resolves to 0.004       
+MPRINT(QA_FINISH):   put @5 "Elapsed time since last dataset check: " @47 "0.004        minutes" ;
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable ELAPSED_HRS_7 resolves to 0           
+MPRINT(QA_FINISH):   put @47 "0            hours";
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 7
+SYMBOLGEN:  Macro variable NOTE7 resolves to Comparison dataset
+MPRINT(QA_FINISH):   put @5 "Dataset Notes: Comparison dataset";
+MPRINT(QA_FINISH):   put /;
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 8; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the stand-alone assertion check results, if any;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %IF condition %eval(&checknum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                    Results of Stand-alone Assertion Checks 
+Performed                  ***";
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MPRINT(QA_FINISH):   put "***                        There were 1 such checks performed           
+   " @91 "***";
+MPRINT(QA_FINISH):   put 
+59                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed and Result" ;
+MPRINT(QA_FINISH):   put @1 "------------" @20 "--------------------------" ;
+SYMBOLGEN:  Macro variable CHECKNUM resolves to 1
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 1; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable CHECKRESULT1 resolves to PASSED-- No US Total included in states 
+            dataset -- TRUE
+MPRINT(QA_FINISH):   put @1 "1" @20 "PASSED-- No US Total included in states dataset -- TRUE";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * Output the within-datastep assertion check results, if any;
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MLOGIC(QA_FINISH):  %IF condition %eval(&anum) > 0 is TRUE
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put "***                Results of Within-Data_Step Assertion Checks 
+Performed                 ***";
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MPRINT(QA_FINISH):   put "***                        There were 3 such checks performed           
+       " @91 "***";
+MPRINT(QA_FINISH):   put "***  Check below this print to make sure there are no failures masked 
+by the fact that a  ***";
+MPRINT(QA_FINISH):   put "***  data step did not complete due to the assertion failure.  The fail 
+message will be   ***";
+MPRINT(QA_FINISH):   put "***  printed both above and below this section.                         
+                  ***";
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put @1 "Check Number" @20 "Check Performed" @75 "Result";
+MPRINT(QA_FINISH):   put @1 "------------" @20 "---------------" @75 "------";
+SYMBOLGEN:  Macro variable ANUM resolves to 3
+MLOGIC(QA_FINISH):  %DO loop beginning; index variable I; start value is 1; stop value is 3; by 
+      value is 1.  
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ASSERTION1 resolves to 1
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 1
+SYMBOLGEN:  Macro variable ARESULT1 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "1" @20 "1" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 2; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  && resolves to &.
+60                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ASSERTION2 resolves to (1=1)
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 2
+SYMBOLGEN:  Macro variable ARESULT2 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "2" @20 "(1=1)" @75 "PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 3; loop will iterate again.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ASSERTION3 resolves to (round(total,.01) = round(state_total_obs,.01))
+SYMBOLGEN:  && resolves to &.
+SYMBOLGEN:  Macro variable I resolves to 3
+SYMBOLGEN:  Macro variable ARESULT3 resolves to PASSED
+MPRINT(QA_FINISH):   put @1 "3" @20 "(round(total,.01) = round(state_total_obs,.01))" @75 
+"PASSED";
+MLOGIC(QA_FINISH):  %DO loop index variable I is now 4; loop will not iterate again.
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   * To be sure that we do no miss an assertion failure, print the fail 
+message, ;
+MPRINT(QA_FINISH):   * if any, four times below the list of sucessful tests. The within-datastep ;
+MPRINT(QA_FINISH):   * failures will not be updated from pass to fail due to to the abort cancel ;
+MPRINT(QA_FINISH):   * that runs directly after them. Data step changes only happen when the data 
+;
+MPRINT(QA_FINISH):   * step completes. Thus the need to make extra sure these failures are highly 
+;
+MPRINT(QA_FINISH):   * visible. ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+MPRINT(QA_FINISH):   put ;
+SYMBOLGEN:  Macro variable FAILMSG resolves to 
+MPRINT(QA_FINISH):   put "  ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to 
+MPRINT(QA_FINISH):   put "  ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to 
+MPRINT(QA_FINISH):   put "  ";
+SYMBOLGEN:  Macro variable FAILMSG resolves to 
+MPRINT(QA_FINISH):   put "  ";
+MPRINT(QA_FINISH):   put ;
+MPRINT(QA_FINISH):   put 
+"*********************************************************************************************";
+SYMBOLGEN:  Macro variable WITHINDS resolves to N
+MLOGIC(QA_FINISH):  %IF condition &withinds = N is TRUE
+MPRINT(QA_FINISH):   run;
+
+NOTE: 93 lines were written to file PRINT.
+NOTE: The DATA step printed pages 1-3.
+NOTE: DATA statement used (Total process time):
+      real time           0.12 seconds
+      cpu time            0.01 seconds
+61                                        The SAS System             07:28 Wednesday, May 23, 2018
+
+      
+
+MLOGIC(QA_FINISH):  Ending execution.
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           3.61 seconds
+      cpu time            0.65 seconds
+      
